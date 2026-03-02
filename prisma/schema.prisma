@@ -1,0 +1,336 @@
+// ETG Vehicle Management System - Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User accounts
+model User {
+  id            String      @id @default(cuid())
+  username      String      @unique
+  email         String      @unique
+  password      String
+  fullName      String
+  role          String      @default("User") // Admin, Manager, User, Driver
+  phone         String?
+  avatar        String?
+  isActive      Boolean     @default(true)
+  lastLogin     DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  sessions      Session[]
+  
+  @@map("users")
+}
+
+// User sessions
+model Session {
+  id          String    @id @default(cuid())
+  userId      String
+  token       String    @unique
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("sessions")
+}
+
+// Vehicle information
+model Vehicle {
+  id                String        @id @default(cuid())
+  plateNumber       String        @unique
+  make              String
+  model             String
+  year              Int
+  color             String
+  vehicleType       String        // Sedan, SUV, Truck, Van, etc.
+  fuelType          String        // Petrol, Diesel, Electric, Hybrid
+  status            String        @default("AVAILABLE") // AVAILABLE, IN USE, MAINTENANCE, RETIRED
+  mileage           Float         @default(0)
+  capacity          Float?        // Seating capacity or load capacity
+  registrationDate  DateTime?
+  insuranceExpiry   DateTime?
+  lastServiceDate   DateTime?
+  nextServiceDate   DateTime?
+  imageUrl          String?
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  drivers           Driver[]
+  maintenance       Maintenance[]
+  fuelRecords       FuelRecord[]
+  trips             Trip[]
+  checkRecords      VehicleCheck[]
+  incidents         Incident[]
+  reminders         Reminder[]
+  
+  @@map("vehicles")
+}
+
+// Driver information
+model Driver {
+  id              String        @id @default(cuid())
+  employeeId      String        @unique
+  name            String
+  email           String?
+  phone           String
+  licenseNumber   String        @unique
+  licenseExpiry   DateTime?
+  licenseClass    String?       // Class A, B, C, etc.
+  status          String        @default("ACTIVE") // ACTIVE, ON LEAVE, INACTIVE, SUSPENDED
+  hireDate        DateTime?
+  dateOfBirth     DateTime?
+  address         String?
+  emergencyContact String?
+  imageUrl        String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  vehicleId       String?
+  vehicle         Vehicle?      @relation(fields: [vehicleId], references: [id])
+  trips           Trip[]
+  checkRecords    VehicleCheck[]
+  incidents       Incident[]
+  reminders       Reminder[]
+  
+  @@map("drivers")
+}
+
+// Maintenance records
+model Maintenance {
+  id              String      @id @default(cuid())
+  vehicleId       String
+  type            String      // JSON array of types
+  description     String
+  startDate       DateTime
+  endDate         DateTime?
+  odometer        Float
+  serviceProvider String?
+  status          String      @default("SCHEDULED") // SCHEDULED, IN PROGRESS, COMPLETED, CANCELLED
+  priority        String      @default("Normal") // Low, Normal, High, Urgent
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  vehicle         Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  @@map("maintenance")
+}
+
+// Fuel records
+model FuelRecord {
+  id              String      @id @default(cuid())
+  vehicleId       String
+  date            DateTime
+  fuelType        String
+  quantity        Float       // Liters
+  odometer        Float
+  station         String?
+  receiptNumber   String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  vehicle         Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  
+  @@map("fuel_records")
+}
+
+// Trip records
+model Trip {
+  id              String      @id @default(cuid())
+  vehicleId       String
+  driverId        String
+  tripType        String      // Business, Personal, Delivery, Pickup
+  origin          String
+  destination     String
+  startOdometer   Float
+  endOdometer     Float?
+  startTime       DateTime
+  endTime         DateTime?
+  distance        Float?
+  purpose         String?
+  status          String      @default("SCHEDULED") // SCHEDULED, IN PROGRESS, COMPLETED, CANCELLED
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  vehicle         Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  driver          Driver      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  
+  @@map("trips")
+}
+
+// System settings
+model Setting {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  value       String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@map("settings")
+}
+
+// Role Permissions
+model RolePermission {
+  id          String    @id @default(cuid())
+  role        String    @unique // Admin, Manager, User, Driver
+  permissions String    // JSON string of permissions array
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("role_permissions")
+}
+
+// Incident and Breakdown records
+model Incident {
+  id                  String      @id @default(cuid())
+  vehicleId           String
+  driverId            String?
+  
+  // Incident details
+  incidentType        String      // Accident, Breakdown, Other
+  date                DateTime
+  location            String?
+  description         String
+  severity            String      @default("Minor") // Minor, Moderate, Major, Critical
+  
+  // Accident specific
+  otherParty          String?
+  otherPartyInsurance String?
+  policeReport        String?
+  damageDescription   String?
+  
+  // Breakdown specific
+  breakdownType       String?     // Mechanical, Electrical, Tire, Engine, Other
+  towRequired         Boolean     @default(false)
+  repairLocation      String?
+  
+  // Status and resolution
+  status              String      @default("OPEN") // OPEN, IN PROGRESS, RESOLVED, CLOSED
+  resolutionDate      DateTime?
+  resolutionNotes     String?
+  
+  // Admin
+  notes               String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  
+  // Relations
+  vehicle             Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  driver              Driver?     @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  
+  @@map("incidents")
+}
+
+// Reminder and alerts
+model Reminder {
+  id              String      @id @default(cuid())
+  type            String      // Service, Insurance, License, Inspection, Registration, Custom
+  title           String
+  description     String?
+  vehicleId       String?
+  driverId        String?
+  dueDate         DateTime
+  reminderDate    DateTime?
+  priority        String      @default("Normal") // Low, Normal, High, Urgent
+  
+  // Recurrence
+  isRecurring     Boolean     @default(false)
+  recurrenceType  String?     // Daily, Weekly, Monthly, Yearly
+  recurrenceValue Int?
+  
+  // Status
+  status          String      @default("PENDING") // PENDING, COMPLETED, DISMISSED, OVERDUE
+  
+  // Admin
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  vehicle         Vehicle?    @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  driver          Driver?     @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  
+  @@map("reminders")
+}
+
+// Vehicle Check-in/Check-out records
+model VehicleCheck {
+  id              String      @id @default(cuid())
+  vehicleId       String
+  driverId        String
+  
+  // Check-out information
+  checkOutTime    DateTime    @default(now())
+  checkOutOdometer Float
+  purpose         String?
+  destination     String?
+  expectedReturn  DateTime?
+  
+  // Check-in information
+  checkInTime     DateTime?
+  checkInOdometer Float?
+  distanceTraveled Float?
+  fuelLevel       String?     // Full, 3/4, 1/2, 1/4, Empty
+  condition       String?     // Good, Fair, Poor
+  issues          String?     // Any issues reported
+  
+  // Status
+  status          String      @default("CHECKED OUT") // CHECKED OUT, CHECKED IN
+  
+  // Admin
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  vehicle         Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  driver          Driver      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  
+  @@map("vehicle_checks")
+}
+
+// Backup Settings
+model BackupSettings {
+  id                String    @id @default(cuid())
+  enabled           Boolean   @default(true)
+  frequency         String    @default("daily") // hourly, daily, weekly, monthly
+  keepCount         Int       @default(10)      // Number of backups to keep
+  lastBackupAt      DateTime?
+  nextBackupAt      DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@map("backup_settings")
+}
+
+// Backup History
+model BackupHistory {
+  id            String    @id @default(cuid())
+  filename      String
+  size          Float
+  type          String    // manual, auto
+  status        String    @default("success") // success, failed
+  errorMessage  String?
+  createdAt     DateTime  @default(now())
+  
+  @@map("backup_history")
+}
