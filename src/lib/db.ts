@@ -1,22 +1,30 @@
+import dotenv from 'dotenv'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+const getPrismaClient = () => {
+  const globalForPrisma = globalThis as unknown as {
+    prisma: PrismaClient | undefined
+  }
 
-export const db =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'production' ? [] : ['query'],
+  const prisma = globalForPrisma.prisma ?? new PrismaClient({
+    log: process.env.NODE_ENV === 'production' ? ['error', 'warn'] : ['query', 'error'],
   })
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+  if (typeof window === 'undefined') globalForPrisma.prisma = prisma
+  return prisma
+}
 
-// Initialize admin user if no users exist
+export const db = getPrismaClient()
+
+// Initialize admin user if no users exist (only in development)
 let initializationPromise: Promise<void> | null = null
 
 export async function ensureAdminUser() {
+  if (process.env.NODE_ENV === 'production') {
+    return
+  }
+
   if (!initializationPromise) {
     initializationPromise = initializeAdminUser()
   }
@@ -26,12 +34,12 @@ export async function ensureAdminUser() {
 async function initializeAdminUser() {
   try {
     const userCount = await db.user.count()
-    
+
     if (userCount === 0) {
       console.log('No users found. Creating default admin user...')
-      
+
       const hashedPassword = await bcrypt.hash('admin123', 10)
-      
+
       await db.user.create({
         data: {
           username: 'admin',
@@ -42,9 +50,9 @@ async function initializeAdminUser() {
           isActive: true,
         },
       })
-      
+
       console.log('Default admin user created: admin@etg.com')
-      
+
       // Create default settings
       const settings = [
         { key: 'company_name', value: 'ETG Vehicle Management', description: 'Company name' },
@@ -62,7 +70,7 @@ async function initializeAdminUser() {
           create: setting,
         })
       }
-      
+
       console.log('Default settings created')
     }
   } catch (error) {

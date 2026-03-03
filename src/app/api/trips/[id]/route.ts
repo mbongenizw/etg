@@ -47,7 +47,7 @@ export async function PUT(
     const data = await request.json();
 
     // Calculate distance if end odometer is provided
-    let distance = undefined;
+    let distance: number | undefined = undefined;
     if (data.endOdometer && data.startOdometer) {
       distance = parseFloat(data.endOdometer) - parseFloat(data.startOdometer);
     }

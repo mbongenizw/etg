@@ -1,0 +1,181 @@
+$ NODE_ENV=development next dev -p 3000
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\mbock\bun.lock as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\bun.lock
+
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.43.202:3000
+- Environments: .env.local, .env
+
+✓ Starting...
+✓ Ready in 3.8s
+○ Compiling /api/auth/login ...
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+prisma:error 
+Invalid `db.user.count()` invocation in
+C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\.next\dev\server\chunks\[root-of-the-server]__630a3625._.js:104:41
+
+  101 }
+  102 async function initializeAdminUser() {
+  103     try {
+→ 104         const userCount = await db.user.count(
+error: Error validating datasource `db`: the URL must start with the protocol `file:`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "sqlite"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+Error initializing admin user: Error [PrismaClientInitializationError]: 
+Invalid `db.user.count()` invocation in
+C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\.next\dev\server\chunks\[root-of-the-server]__630a3625._.js:104:41
+
+  101 }
+  102 async function initializeAdminUser() {
+  103     try {
+→ 104         const userCount = await db.user.count(
+error: Error validating datasource `db`: the URL must start with the protocol `file:`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "sqlite"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+    at <unknown> (src\lib\db.ts:33:37)
+    at <unknown> (-->  schema.prisma:9)
+    at async initializeAdminUser (src\lib\db.ts:33:23)
+  31 | async function initializeAdminUser() {
+  32 |   try {
+> 33 |     const userCount = await db.user.count()
+     |                                     ^
+  34 |
+  35 |     if (userCount === 0) {
+  36 |       console.log('No users found. Creating default admin user...') {
+  clientVersion: '6.19.2',
+  errorCode: undefined,
+  retryable: undefined
+}
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].user.findUnique()` invocation in
+C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\.next\dev\server\chunks\[root-of-the-server]__630a3625._.js:251:201
+
+  248     return session?.user ?? null;
+  249 }
+  250 async function login(email, password) {
+→ 251     const user = await __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].user.findUnique(
+error: Error validating datasource `db`: the URL must start with the protocol `file:`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "sqlite"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+Login error: Error [PrismaClientInitializationError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].user.findUnique()` invocation in
+C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\.next\dev\server\chunks\[root-of-the-server]__630a3625._.js:251:201
+
+  248     return session?.user ?? null;
+  249 }
+  250 async function login(email, password) {
+→ 251     const user = await __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].user.findUnique(
+error: Error validating datasource `db`: the URL must start with the protocol `file:`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "sqlite"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+    at <unknown> (src\lib\auth.ts:58:30)
+    at <unknown> (-->  schema.prisma:9)
+    at async login (src\lib\auth.ts:58:16)
+    at async POST (src\app\api\auth\login\route.ts:20:20)
+  56 |
+  57 | export async function login(email: string, password: string) {
+> 58 |   const user = await db.user.findUnique({
+     |                              ^
+  59 |     where: { email },
+  60 |   });
+  61 | {
+  clientVersion: '6.19.2',
+  errorCode: undefined,
+  retryable: undefined
+}
+ POST /api/auth/login 500 in 8.1s (compile: 7.2s, render: 851ms)
+○ Compiling /login ...
+ GET /login 200 in 12.3s (compile: 10.0s, render: 2.3s)
+○ Compiling /api/auth/me ...
+prisma:error 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].session.findUnique()` invocation in
+C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\.next\dev\server\chunks\[root-of-the-server]__630a3625._.js:224:207
+
+  221     return token;
+  222 }
+  223 async function getSession(token) {
+→ 224     const session = await __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].session.findUnique(
+error: Error validating datasource `db`: the URL must start with the protocol `file:`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "sqlite"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+Get current user error: Error [PrismaClientInitializationError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].session.findUnique()` invocation in
+C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\.next\dev\server\chunks\[root-of-the-server]__630a3625._.js:224:207
+
+  221     return token;
+  222 }
+  223 async function getSession(token) {
+→ 224     const session = await __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$Clients$2f$ETG$2f$workspace$2d$ETG$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].session.findUnique(
+error: Error validating datasource `db`: the URL must start with the protocol `file:`.
+  -->  schema.prisma:9
+   | 
+ 8 |   provider = "sqlite"
+ 9 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+    at <unknown> (src\lib\auth.ts:33:36)
+    at <unknown> (-->  schema.prisma:9)
+    at async getSession (src\lib\auth.ts:33:19)
+    at async getCurrentUser (src\lib\auth.ts:53:19)
+    at async GET (src\app\api\auth\me\route.ts:6:18)
+  31 |
+  32 | export async function getSession(token: string) {
+> 33 |   const session = await db.session.findUnique({
+     |                                    ^
+  34 |     where: { token },
+  35 |     include: { user: true },
+  36 |   }); {
+  clientVersion: '6.19.2',
+  errorCode: undefined,
+  retryable: undefined
+}
+ GET /api/auth/me 500 in 9.9s (compile: 9.4s, render: 559ms)
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\mbock\bun.lock as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\mbock\Documents\Clients\ETG\workspace-ETG\bun.lock
+
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.43.202:3000
+- Environments: .env.local, .env
+
+✓ Starting...
+Error: The key "NODE_ENV" under "env" in next.config.ts is not allowed. https://nextjs.org/docs/messages/env-key-not-allowed
+    at ignore-listed frames
+[?25h
+error: script "dev" exited with code 1
