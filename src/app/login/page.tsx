@@ -53,7 +53,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-800 to-amber-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <Card className="w-full max-w-md shadow-xl border-amber-700 bg-amber-50">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
