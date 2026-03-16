@@ -48,7 +48,14 @@ test
 prompt
 
 server.log
-# Skills directory
+# examples directory
+/examples/
+# skills directory
 /skills/
 .vercel
 .env*.local
+
+# Database utility scripts
+check-database.ts
+check-prisma.ts
+build.log
